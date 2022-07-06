@@ -14,8 +14,8 @@ library("raster")
 ####Cleaning coral reef data
 
 #loading coral reef distribution shapefiles, points and multipolygons
-c_pt_raw <- st_read("./Data/01_Data/WCMC008_CoralReef2018_Pt_v4.shp")
-c_py_raw <- st_read("./Data/01_Data/WCMC008_CoralReef2018_Py_v4.shp")
+c_pt_raw <- st_read("./data/01_data/WCMC008_CoralReef2018_Pt_v4.shp")
+c_py_raw <- st_read("./data/01_data/WCMC008_CoralReef2018_Py_v4.shp")
 
 #Summarise by PARENT_ISO and ISO3
 ctry_py <- c_py_raw %>%
@@ -56,7 +56,7 @@ world_crs <- function(x) {st_transform(x, crs = 4326)
 
 #Project coral reef data - only required for polygon data
 c_py_row <- lapply(split(c_py, 1:nrow(c_py)), local_reproj)
-list.save(c_py_row, file="./Output/c_py_row_projections.RData")
+list.save(c_py_row, file="./Output/c_py_row_projections.Rdata")
 
 ## Buffers creation on locally projected polygons 
 
@@ -67,7 +67,7 @@ buffer_100 <- function(x) {st_buffer(x, dist = 100000)
 #buffers around polygons
 buffer_100_py <- lapply(c_py_row, buffer_100)
 #save raw buffer data
-list.save(buffer_100_py, file="./Output/buffer_100_py_row.RData")
+list.save(buffer_100_py, file="./Output/buffer_100_py_row.Rdata")
 #project buffers to CRS 4326
 buffer_100_py_2<-lapply(buffer_100_py, world_crs)
 #create into one dataframe
@@ -78,7 +78,7 @@ st_write(obj <- buffer_100_py_3, dsn ="./Output/Coral_poly_100km.gpkg", delete_d
 #buffers around points
 buffer_100_pt <- lapply(c_pt_row, buffer_100)
 #save raw buffer data
-list.save(buffer_100_pt, file="./Output/buffer_100_pt_row.RData")
+list.save(buffer_100_pt, file="./Output/buffer_100_pt_row.Rdata")
 #project buffers to CRS 4326
 buffer_100_pt_2<-lapply(buffer_100_pt, world_crs)
 #create into one dataframe
@@ -96,13 +96,13 @@ buffer_50 <- function(x) {st_buffer(x, dist = 50000)
 }
 
 buffer_50_py <- lapply(c_py_row, buffer_50)
-list.save(buffer_50_py, file="./Output/buffer_50_py_row.RData")
+list.save(buffer_50_py, file="./Output/buffer_50_py_row.Rdata")
 buffer_50_py_2<-lapply(buffer_50_py, world_crs)
 buffer_50_py_3<-do.call(rbind, buffer_50_py_2)
 st_write(obj <- buffer_50_py_3, dsn ="./Output/Coral_poly_50km.gpkg", delete_dsn =TRUE)
 
 buffer_50_pt <- lapply(c_pt_row, buffer_50)
-list.save(buffer_50_pt, file="./Output/buffer_50_pt_row.RData")
+list.save(buffer_50_pt, file="./Output/buffer_50_pt_row.Rdata")
 buffer_50_pt_2<-lapply(buffer_50_pt, world_crs)
 buffer_50_pt_3<-do.call(rbind, buffer_50_pt_2)
 st_write(obj <- buffer_50_pt_3, dsn ="./Output/Coral_point_50km.gpkg", delete_dsn =TRUE)
@@ -116,13 +116,13 @@ buffer_30 <- function(x) {st_buffer(x, dist = 30000)
 }
 
 buffer_30_py <- lapply(c_py_row, buffer_30)
-list.save(buffer_30_py, file="./Output/buffer_30_py_row.RData")
+list.save(buffer_30_py, file="./Output/buffer_30_py_row.Rdata")
 buffer_30_py_2<-lapply(buffer_30_py, world_crs)
 buffer_30_py_3<-do.call(rbind, buffer_30_py_2)
 st_write(obj <- buffer_30_py_3, dsn ="./Output/Coral_poly_30km.gpkg", delete_dsn =TRUE)
 
 buffer_30_pt <- lapply(c_pt_row, buffer_30)
-list.save(buffer_30_pt, file="./Output/buffer_30_pt_row.RData")
+list.save(buffer_30_pt, file="./Output/buffer_30_pt_row.Rdata")
 buffer_30_pt_2<-lapply(buffer_30_pt, world_crs)
 buffer_30_pt_3<-do.call(rbind, buffer_30_pt_2)
 st_write(obj <- buffer_30_pt_3, dsn ="./Output/Coral_point_30km.gpkg", delete_dsn =TRUE)
@@ -136,13 +136,13 @@ buffer_10 <- function(x) {st_buffer(x, dist = 10000)
 }
 
 buffer_10_py <- lapply(c_py_row, buffer_10)
-list.save(buffer_10_py, file="./Output/buffer_10_py_row.RData")
+list.save(buffer_10_py, file="./Output/buffer_10_py_row.Rdata")
 buffer_10_py_2<-lapply(buffer_10_py, world_crs)
 buffer_10_py_3<-do.call(rbind, buffer_10_py_2)
 st_write(obj <- buffer_10_py_3, dsn ="./Output/Coral_poly_10km.gpkg", delete_dsn =TRUE)
 
 buffer_10_pt <- lapply(c_pt_row, buffer_10)
-list.save(buffer_10_pt, file="./Output/buffer_10_pt_row.RData")
+list.save(buffer_10_pt, file="./Output/buffer_10_pt_row.Rdata")
 buffer_10_pt_2<-lapply(buffer_10_pt, world_crs)
 buffer_10_pt_3<-do.call(rbind, buffer_10_pt_2)
 st_write(obj <- buffer_10_pt_3, dsn ="./Output/Coral_point_10km.gpkg", delete_dsn =TRUE)
@@ -156,13 +156,13 @@ buffer_5 <- function(x) {st_buffer(x, dist = 5000)
 }
 
 buffer_5_py <- lapply(c_py_row, buffer_5)
-list.save(buffer_5_py, file="./Output/buffer_5_py_row.RData")
+list.save(buffer_5_py, file="./Output/buffer_5_py_row.Rdata")
 buffer_5_py_2<-lapply(buffer_5_py, world_crs)
 buffer_5_py_3<-do.call(rbind, buffer_5_py_2)
 st_write(obj <- buffer_5_py_3, dsn ="./Output/Coral_poly_5km.gpkg", delete_dsn =TRUE)
 
 buffer_5_pt <- lapply(c_pt_row, buffer_5)
-list.save(buffer_5_pt, file="./Output/buffer_5_pt_row.RData")
+list.save(buffer_5_pt, file="./Output/buffer_5_pt_row.Rdata")
 buffer_5_pt_2<-lapply(buffer_5_pt, world_crs)
 buffer_5_pt_3<-do.call(rbind, buffer_5_pt_2)
 st_write(obj <- buffer_5_pt_3, dsn ="./Output/Coral_point_5km.gpkg", delete_dsn =TRUE)
@@ -173,10 +173,10 @@ buffer_5_pt<- st_read("./Output/Coral_point_5km.gpkg")
 #### Cleaning buffers
 
 #loading in world data from GADM
-world <- st_read("./Data/gadm36_levels.gpkg", "level0") #redirect when required
+world <- st_read("./data/gadm36_levels.gpkg", "level0") #redirect when required
 names(world)[1] <- "ISO3"
 #load coral country information to add regionl data attributes
-coral_countries_info<-read.csv("./Data/Coral_Reef_Countries.csv")
+coral_countries_info<-read.csv("./data/Coral_Reef_Countries.csv")
 
 #100km clean-up
 #this is gives overlapping portion of polygons
@@ -197,19 +197,21 @@ buffer_100_all_row_3<-st_intersection(buffer_100_all_row_2, coral_poly)
 buffer_100_all_row_one<-buffer_100_all_row_3%>%group_by(ISO3.1, NAME_0)%>%summarize()
 #work out area of each country polygon
 buffer_100_all_row_one$buffer_area_km2<-set_units(st_area(buffer_100_all_row_one), "km2")
-#matching ISO3 codes to obtain the regional information 
-buffer_100_all_row_one$region<-coral_countries_info$Ocean_Region[match(buffer_100_all_row_one$ISO3.1, coral_countries_info$ISO3)]
+#matching ISO3 codes to obtain, coral country attributes 
+buffer_100_all_row_one$region<-coral_countries_info$Region_coral[match(buffer_100_all_row_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_100_all_row_one$SID<-coral_countries_info$SID[match(buffer_100_all_row_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_100_all_row_one$Income_Group<-coral_countries_info$Income_Group[match(buffer_100_all_row_one$ISO3.1, coral_countries_info$ISO3)]
 #save cleaned up buffers
-st_write(obj = buffer_100_all_row_one, dsn ="./Data/Coral_buffer_100km_clean.gpkg", delete_dsn =TRUE)
+st_write(obj = buffer_100_all_row_one, dsn ="./data/Coral_buffer_100km_clean.gpkg", delete_dsn =TRUE)
 #if required for loading
-buffer_100km <- st_read("./Data/Coral_buffer_100km_clean.gpkg")
+buffer_100km <- st_read("./data/Coral_buffer_100km_clean.gpkg")
 
 
 ####Coral polygon dataframe
 #This contains countries that around found within 100km of coral reefs from GADM world data
 #Will be used to extract country-wide population data from LandScan
 
-st_write(obj = coral_poly, dsn ="./Data/coral_poly.gpkg", delete_dsn =TRUE)
+st_write(obj = coral_poly, dsn ="./data/coral_poly.gpkg", delete_dsn =TRUE)
 
 
 #50km clean-up
@@ -225,9 +227,11 @@ coral_poly_50<-world[buffer_50_all_2, ]
 buffer_50_all_3<-st_intersection(buffer_50_all_2, coral_poly_50)
 buffer_50_all_one<-buffer_50_all_3%>%group_by(ISO3.1, NAME_0)%>%summarize()
 buffer_50_all_one$buffer_area_km2<-set_units(st_area(buffer_50_all_one), "km2")
-buffer_50_all_one$region<-coral_countries_info$Ocean_Region[match(buffer_50_all_one$ISO3.1, coral_countries_info$ISO3)]
-st_write(obj = buffer_50_all_one, dsn ="./Data/Coral_buffer_50km_clean.gpkg", delete_dsn =TRUE)
-buffer_50km <- st_read("./Data/Coral_buffer_50km_clean.gpkg")
+buffer_50_all_one$region<-coral_countries_info$Region_coral[match(buffer_50_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_50_all_one$SID<-coral_countries_info$SID[match(buffer_50_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_50_all_one$Income_Group<-coral_countries_info$Income_Group[match(buffer_50_all_one$ISO3.1, coral_countries_info$ISO3)]
+st_write(obj = buffer_50_all_one, dsn ="./data/Coral_buffer_50km_clean.gpkg", delete_dsn =TRUE)
+buffer_50km <- st_read("./data/Coral_buffer_50km_clean.gpkg")
 
 
 
@@ -245,9 +249,11 @@ coral_poly_30<-world[buffer_30_all_2, ]
 buffer_30_all_3<-st_intersection(buffer_30_all_2, coral_poly_30)
 buffer_30_all_one<-buffer_30_all_3%>%group_by(ISO3.1, NAME_0)%>%summarize()  #here added grouping value, see if it makes any difference
 buffer_30_all_one$buffer_area_km2<-set_units(st_area(buffer_30_all_one), "km2")
-buffer_30_all_one$region<-coral_countries_info$Ocean_Region[match(buffer_30_all_one$ISO3.1, coral_countries_info$ISO3)]
-st_write(obj = buffer_30_all_one, dsn ="./Data/Coral_buffer_30km_clean.gpkg", delete_dsn =TRUE)
-buffer_30km <- st_read("./Data/Coral_buffer_30km_clean.gpkg")
+buffer_30_all_one$region<-coral_countries_info$Region_coral[match(buffer_30_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_30_all_one$SID<-coral_countries_info$SID[match(buffer_30_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_30_all_one$Income_Group<-coral_countries_info$Income_Group[match(buffer_30_all_one$ISO3.1, coral_countries_info$ISO3)]
+st_write(obj = buffer_30_all_one, dsn ="./data/Coral_buffer_30km_clean.gpkg", delete_dsn =TRUE)
+buffer_30km <- st_read("./data/Coral_buffer_30km_clean.gpkg")
 
 
 #10km clean-up
@@ -263,9 +269,11 @@ coral_poly_10<-world[buffer_10_all_2, ]
 buffer_10_all_3<-st_intersection(buffer_10_all_2, coral_poly_10)
 buffer_10_all_one<-buffer_10_all_3%>%group_by(ISO3.1, NAME_0)%>%summarize()
 buffer_10_all_one$buffer_area_km2<-set_units(st_area(buffer_10_all_one), "km2")
-buffer_10_all_one$region<-coral_countries_info$Ocean_Region[match(buffer_10_all_one$ISO3.1, coral_countries_info$ISO3)]
-st_write(obj = buffer_10_all_one, dsn ="./Data/Coral_buffer_10km_clean.gpkg", delete_dsn =TRUE)
-buffer_10km <- st_read("./Data/Coral_buffer_10km_clean.gpkg")
+buffer_10_all_one$region<-coral_countries_info$Region_coral[match(buffer_10_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_10_all_one$SID<-coral_countries_info$SID[match(buffer_10_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_10_all_one$Income_Group<-coral_countries_info$Income_Group[match(buffer_10_all_one$ISO3.1, coral_countries_info$ISO3)]
+st_write(obj = buffer_10_all_one, dsn ="./data/Coral_buffer_10km_clean.gpkg", delete_dsn =TRUE)
+buffer_10km <- st_read("./data/Coral_buffer_10km_clean.gpkg")
 
 
 #5km clean-up
@@ -281,15 +289,17 @@ coral_poly_5<-world[buffer_5_all_2, ]
 buffer_5_all_3<-st_intersection(buffer_5_all_2, coral_poly_5)
 buffer_5_all_one<-buffer_5_all_3%>%group_by(ISO3.1, NAME_0)%>%summarize()
 buffer_5_all_one$buffer_area_km2<-set_units(st_area(buffer_5_all_one), "km2")
-buffer_5_all_one$region<-coral_countries_info$Ocean_Region[match(buffer_5_all_one$ISO3.1, coral_countries_info$ISO3)]
-st_write(obj = buffer_5_all_one, dsn ="./Data/Coral_buffer_5km_clean.gpkg", delete_dsn =TRUE)
-buffer_5km <- st_read("./Data/Coral_buffer_5km_clean.gpkg")
+buffer_5_all_one$region<-coral_countries_info$Region_coral[match(buffer_5_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_5_all_one$SID<-coral_countries_info$SID[match(buffer_5_all_one$ISO3.1, coral_countries_info$ISO3)]
+buffer_5_all_one$Income_Group<-coral_countries_info$Income_Group[match(buffer_5_all_one$ISO3.1, coral_countries_info$ISO3)]
+st_write(obj = buffer_5_all_one, dsn ="./data/Coral_buffer_5km_clean.gpkg", delete_dsn =TRUE)
+buffer_5km <- st_read("./data/Coral_buffer_5km_clean.gpkg")
 
 
 #### US buffers - 
 
 #Get US states data
-us <- getData("GADM",country="USA",level=1)
+us <- getdata("GADM",country="USA",level=1)
 us.states <- us[us$NAME_1 %in% states,]
 us.states<-st_as_sf(us.states)
 
@@ -310,11 +320,13 @@ us_buffers_10km$buffer_area_km2<-set_units(st_area(us_buffers_10km), "km2")
 us_buffers_5km$buffer_area_km2<-set_units(st_area(us_buffers_5km), "km2")
 us_buffers_1km$buffer_area_km2<-set_units(st_area(us_buffers_1km), "km2")
 
+
+
 #save US buffers
-st_write(us.states, "./Data/us.states.gpkg")
-st_write(us_buffers_100km, "./Data/US_buffer_100km.gpkg")
-st_write(us_buffers_50km, "./Data/US_buffer_50km.gpkg")
-st_write(us_buffers_30km, "./Data/US_buffer_30km.gpkg")
-st_write(us_buffers_10km, "./Data/US_buffer_10km.gpkg")
-st_write(us_buffers_5km, "./Data/US_buffer_5km.gpkg")
-st_write(us_buffers_1km, "./Data/US_buffer_1km.gpkg")
+st_write(us.states, "./data/us.states.gpkg")
+st_write(us_buffers_100km, "./data/US_buffer_100km.gpkg")
+st_write(us_buffers_50km, "./data/US_buffer_50km.gpkg")
+st_write(us_buffers_30km, "./data/US_buffer_30km.gpkg")
+st_write(us_buffers_10km, "./data/US_buffer_10km.gpkg")
+st_write(us_buffers_5km, "./data/US_buffer_5km.gpkg")
+st_write(us_buffers_1km, "./data/US_buffer_1km.gpkg")

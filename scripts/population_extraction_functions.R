@@ -9,18 +9,18 @@ if(!require(tibble)){install.packages("tibble"); library(tibble)}
 
 
 #Load in polygons for extractions - coral reef countries and distance buffers
-buffer_100km <- st_read("./Data/Coral_buffer_100km_clean.gpkg")
-buffer_50km <- st_read("./Data/Coral_buffer_50km_clean.gpkg")
-buffer_30km <- st_read("./Data/Coral_buffer_30km_clean.gpkg")
-buffer_10km <- st_read("./Data/Coral_buffer_10km_clean.gpkg")
-buffer_5km <- st_read("./Data/Coral_buffer_5km_clean.gpkg")
-buffer_1km <- st_read("./Data/Coral_buffer_1km_clean.gpkg")
+buffer_100km <- st_read("./data/Coral_buffer_100km_clean.gpkg")
+buffer_50km <- st_read("./data/Coral_buffer_50km_clean.gpkg")
+buffer_30km <- st_read("./data/Coral_buffer_30km_clean.gpkg")
+buffer_10km <- st_read("./data/Coral_buffer_10km_clean.gpkg")
+buffer_5km <- st_read("./data/Coral_buffer_5km_clean.gpkg")
+buffer_1km <- st_read("./data/Coral_buffer_1km_clean.gpkg")
 
 #Use coral_poly to only extract data for coral reef countries as this will speed up all analyses - 11.05.2022 - need to optimise the functions already written
-coral_poly <- st_read("./Data/coral_poly.gpkg") #All coral reef countries within 100km of coral reefs
+coral_poly <- st_read("./data/coral_poly.gpkg") #All coral reef countries within 100km of coral reefs
 
 #this is for the new format of Landscan data files - renamed 2018 to 3018 for cross checking data. 
-filenames <- list.files(path = "./Data/LandScan/",
+filenames <- list.files(path = "./data/LandScan/",
                         pattern = ".tif",
                         full.names = TRUE,
                         recursive = TRUE)
