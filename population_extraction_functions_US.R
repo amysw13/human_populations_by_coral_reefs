@@ -1,40 +1,30 @@
-####R workflow for human population extractions 
+#population analysis 
 
 #setwd("/home/as17697")
 
-#Load packages
-if(!require(sf)){install.packages("sf"); library(sf)}
-if(!require(velox)){install.packages("velox"); library(velox)}
-if(!require(tibble)){install.packages("tibble"); library(tibble)}
+library("raster")
+library("sf")
+library("units")
+library("velox")
+library("tibble")
 
-
-#Load in polygons for extractions - coral reef countries and distance buffers
-buffer_100km <- st_read("./Data/Coral_buffer_100km_clean.gpkg")
-buffer_50km <- st_read("./Data/Coral_buffer_50km_clean.gpkg")
-buffer_30km <- st_read("./Data/Coral_buffer_30km_clean.gpkg")
-buffer_10km <- st_read("./Data/Coral_buffer_10km_clean.gpkg")
-buffer_5km <- st_read("./Data/Coral_buffer_5km_clean.gpkg")
-buffer_1km <- st_read("./Data/Coral_buffer_1km_clean.gpkg")
-
-#Use coral_poly to only extract data for coral reef countries as this will speed up all analyses - 11.05.2022 - need to optimise the functions already written
-coral_poly <- st_read("./Data/coral_poly.gpkg") #All coral reef countries within 100km of coral reefs
-
-#this is for the new format of Landscan data files - renamed 2018 to 3018 for cross checking data. 
-filenames <- list.files(path = "./Data/LandScan/",
-                        pattern = ".tif",
-                        full.names = TRUE,
-                        recursive = TRUE)
-
+##reading in us_buffers
+us.states<-st_read("./Data/us.states.gpkg")
+us_buffer_100km<-st_read( "./Data/US_buffer_100km.gpkg")
+us_buffer_50km <-st_read("./Data/US_buffer_50km.gpkg")
+us_buffer_30km<-st_read( "./Data/US_buffer_30km.gpkg")
+us_buffer_10km<-st_read( "./Data/US_buffer_10km.gpkg")
+us_buffer_5km<-st_read( "./Data/US_buffer_5km.gpkg")
 
 ####World & Coral Country (cc) extraction - Function 1####
-extract_wld <-function(filenames)
+extract_wld_us <-function(filenames) 
 {
-  dat<-velox(filenames) #load file
-  x_1 <- dat$extract(coral_poly, fun=function(t) sum(t,na.rm=TRUE)) #extraction using velox pkg
+  dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
+  x_1 <- dat$extract(us.states, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,FUN = function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(coral_poly, x_2)
+  x_3 <- cbind(us.states, x_2)
   #cleaning some of the data and adding year columns
   colnames(x_3)[colnames(x_3)=="x_2"] <- "Total_pop"
   #renaming column
@@ -42,30 +32,33 @@ extract_wld <-function(filenames)
   #adding year column
   x_3<-tibble::add_column(x_3, Year = regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)), .after = "NAME_0") #add_column function from tibble package
   #drop geometry to allow for saving in .csv
-  x_4 <- st_drop_geometry(x_3)
+  x_4 <-sf::st_drop_geometry(x_3)
   ##saving data as .gpkg (retaining spatial data for mapping)
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_world_val.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_world_val.csv"))
-  
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_val.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_val.csv"))
 }
 
 
 ####Testing function on files for population extraction ####
 for (f in filenames){
   print(f)
-  extract_wld(f)
+  tic("Population Extraction - US_states") #start timing of extraction function
+  extract_wld_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
 
-extract_100 <-function(filenames)
+
+####100km population extraction - Function 2####
+extract_100_us <-function(filenames) 
 {
-  dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file and project to 4362
+  dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
   #clip raster prior to extraction
-  x_1 <- dat$extract(buffer_100km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
+  x_1 <- dat$extract(us_buffer_100km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(buffer_100km, x_2)
+  x_3 <- cbind(us_buffer_100km, x_2)
   #renaming column
   colnames(x_3)[colnames(x_3)=="x_2"] <- "pop"
   #renaming column
@@ -76,30 +69,32 @@ extract_100 <-function(filenames)
   x_3<-add_column(x_3, Distance = "100km", .after = "Year")
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
-  ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100_retest.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100_retest.csv"))
+  ##saving data as .gpkg 
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_100.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_100.csv"))
 }
 
-#Results 11.05.2022 - upon testing the results from majority of countries the same,
-#with a few countries having differing values by a few %. Is this worth re-analysing the whole study
+
 
 for (f in filenames){
   print(f)
-  extract_100(f)
+  tic("Population Extraction - 100km") #start timing of extraction function
+  extract_100_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
 
+
 ####50km population extraction - Function 3####
-extract_50 <-function(filenames)
+extract_50_us <-function(filenames) 
 {
   dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
   #clip raster prior to extraction
-  x_1 <- dat$extract(buffer_50km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
+  x_1 <- dat$extract(us_buffer_50km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(buffer_50km, x_2)
+  x_3 <- cbind(us_buffer_50km, x_2)
   #renaming column
   colnames(x_3)[colnames(x_3)=="x_2"] <- "pop"
   #renaming column
@@ -110,28 +105,30 @@ extract_50 <-function(filenames)
   x_3<-add_column(x_3, Distance = "50km", .after = "Year")
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
-  ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_50.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_50.csv"))
+  ##saving data as .gpkg 
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_50.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_50.csv"))
 }
 
 
 for (f in filenames){
   print(f)
-  extract_50(f)
+  tic("Population Extraction - 50km") #start timing of extraction function
+  extract_50_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
 
 ####30km population extraction - Function 4####
-extract_30 <-function(filenames)
+extract_30_us <-function(filenames) 
 {
   dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
   #clip raster prior to extraction
-  x_1 <- dat$extract(buffer_30km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
+  x_1 <- dat$extract(us_buffer_30km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(buffer_30km, x_2)
+  x_3 <- cbind(us_buffer_30km, x_2)
   #renaming column
   colnames(x_3)[colnames(x_3)=="x_2"] <- "pop"
   #renaming column
@@ -142,28 +139,30 @@ extract_30 <-function(filenames)
   x_3<-add_column(x_3, Distance = "30km", .after = "Year")
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
-  ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_30.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_30.csv"))
+  ##saving data as .gpkg 
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_30.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_30.csv"))
 }
 
 
 for (f in filenames){
   print(f)
-  extract_30(f)
+  tic("Population Extraction - 30km") #start timing of extraction function
+  extract_30_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
 
 ####10km population extraction - Function 5####
-extract_10 <-function(filenames)
+extract_10_us <-function(filenames) 
 {
   dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
   #clip raster prior to extraction
-  x_1 <- dat$extract(buffer_10km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
+  x_1 <- dat$extract(us_buffer_10km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(buffer_10km, x_2)
+  x_3 <- cbind(us_buffer_10km, x_2)
   #renaming column
   colnames(x_3)[colnames(x_3)=="x_2"] <- "pop"
   #renaming column
@@ -174,29 +173,31 @@ extract_10 <-function(filenames)
   x_3<-add_column(x_3, Distance = "10km", .after = "Year")
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
-  ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_10.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_10.csv"))
+  ##saving data as .gpkg 
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_10.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_10.csv"))
 }
 
 
 for (f in filenames){
   print(f)
-  extract_10(f)
+  tic("Population Extraction - 10km") #start timing of extraction function
+  extract_10_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
 
 
 ####5km population extraction - Function 6####
-extract_5 <-function(filenames)
+extract_5_us <-function(filenames) 
 {
   dat<-velox(filenames, crs="+proj=longlat +datum=WGS84 +no_defs") #load file
   #clip raster prior to extraction
-  x_1 <- dat$extract(buffer_5km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
+  x_1 <- dat$extract(us_buffer_5km, fun=function(t) sum(t,na.rm=TRUE)) #extraction from velox pkg
   #need to unlist the extracted values and sum the pop den
   x_2 <- unlist(lapply(x_1,function(x) if (!is.null(x)) sum(x, na.rm=TRUE) else NA))
   #join unlisted values to df
-  x_3 <- cbind(buffer_5km, x_2)
+  x_3 <- cbind(us_buffer_5km, x_2)
   #renaming column
   colnames(x_3)[colnames(x_3)=="x_2"] <- "pop"
   #renaming column
@@ -207,14 +208,17 @@ extract_5 <-function(filenames)
   x_3<-add_column(x_3, Distance = "5km", .after = "Year")
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
-  ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_5.gpkg"), delete_dsn =TRUE)
-  #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_5.csv"))
+  ##saving data as .gpkg 
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_5.gpkg"), delete_dsn =TRUE)
+  #saving population values into .csv for checking 
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_us_5.csv"))
 }
 
 
 for (f in filenames){
   print(f)
-  extract_5(f)
+  tic("Population Extraction - 5km") #start timing of extraction function
+  extract_5_us(f)
+  toc(log = TRUE, quiet = TRUE)#closing timing and logging times
 }
+
