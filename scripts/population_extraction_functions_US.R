@@ -9,12 +9,12 @@ library("velox")
 library("tibble")
 
 ##reading in us_buffers
-us.states<-st_read("./Data/us.states.gpkg")
-us_buffer_100km<-st_read( "./Data/US_buffer_100km.gpkg")
-us_buffer_50km <-st_read("./Data/US_buffer_50km.gpkg")
-us_buffer_30km<-st_read( "./Data/US_buffer_30km.gpkg")
-us_buffer_10km<-st_read( "./Data/US_buffer_10km.gpkg")
-us_buffer_5km<-st_read( "./Data/US_buffer_5km.gpkg")
+us.states<-st_read("./data/us.states.gpkg")
+us_buffer_100km<-st_read( "./data/US_buffer_100km.gpkg")
+us_buffer_50km <-st_read("./data/US_buffer_50km.gpkg")
+us_buffer_30km<-st_read( "./data/US_buffer_30km.gpkg")
+us_buffer_10km<-st_read( "./data/US_buffer_10km.gpkg")
+us_buffer_5km<-st_read( "./data/US_buffer_5km.gpkg")
 
 ####World & Coral Country (cc) extraction - Function 1####
 extract_wld_us <-function(filenames) 
