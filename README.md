@@ -46,19 +46,19 @@ analysis of the study
 
 4.**Population\_merging\_wrangling.R**
 
--   Merging population data by years
-
-5.**Grouping\_population\_df.R**
-
--   Creating dataframes for:
+-   Merging population data for coral reef countries
+    -   Only 2020 and 2019 examples included in repository
+    -   Obtaining population growth values from The World Bank
+-   Summarising for “world” statistics (all coral reef countries)
+-   Creating dataframes for plotting:
     -   Region
     -   SID
     -   Income\_group
 
-6.**Plotting\_main\_graphs.R**
+5.**Plotting\_main\_graphs.R**
 
 -   Plotting the main figures found in the study
 
-7.**Tables\_df.R**
+6.**Tables\_df.R**
 
 -   Wrangling df’s to create tables for study

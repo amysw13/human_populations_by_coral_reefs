@@ -55,20 +55,19 @@ Use the following scripts in order to repeat population extractions and analysis
     
   4.**Population_merging_wrangling.R**
     
-  - Merging population data by years
-  
-  5.**Grouping_population_df.R**
-    
-  - Creating dataframes for:
+  - Merging population data for coral reef countries
+    - Obtaining population growth values from The World Bank
+  - Summarising for "world" statistics (all coral reef countries)
+  - Creating dataframes for plotting:
     - Region
     - SID
     - Income_group
-  
-  6.**Plotting_main_graphs.R**
+
+  5.**Plotting_main_graphs.R**
     
   - Plotting the main figures found in the study
     
-  7.**Tables_df.R**
+  6.**Tables_df.R**
     
   - Wrangling df's to create tables for study 
     
