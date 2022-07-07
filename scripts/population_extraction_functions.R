@@ -47,8 +47,7 @@ extract_wld <-function(filenames)
   st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_world_val.gpkg"), delete_dsn =TRUE)
   #saving population values into .csv for checking
   write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_world_val.csv"))
-  
-}
+ }
 
 
 ####Testing function on files for population extraction ####
@@ -77,9 +76,9 @@ extract_100 <-function(filenames)
   #drop geometry to allow for saving in .CSV
   x_4 <-st_drop_geometry(x_3)
   ##saving data as .gpkg
-  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100_retest.gpkg"), delete_dsn =TRUE)
+  st_write(x_3, dsn = paste0("./Output_pop/Coral_pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100.gpkg"), delete_dsn =TRUE)
   #saving population values into .csv for checking
-  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100_retest.csv"))
+  write.csv(x_4, file = paste0("./Output_pop/Pop_ls",regmatches(filenames, regexpr("[0-9].*[0-9]",filenames)),"_100.csv"))
 }
 
 #Results 11.05.2022 - upon testing the results from majority of countries the same,

@@ -164,30 +164,6 @@ ls_2019_pop<-ls_2019_pop%>%
          pop_den = (pop/buffer_area))%>%
   ungroup()
 
-##Creating world summaries of population
-#2020 population data
-ls_2020_wld_pop<-ls_2020_pop%>%
-  group_by(Distance, Year)%>%
-  dplyr::filter(!pop ==0 )%>%
-  dplyr::summarise(n_countries = length(unique(ISO3)),
-                  pop = sum(pop, na.rm = TRUE), 
-                   buffer_area = sum(buffer_area, na.rm = TRUE),
-            ISO3 = "WLD", NAME_0 = "World")%>%
-  dplyr::mutate(SP.POP.TOTL = sum(ls_2020_pop_cc$SP.POP.TOTL),
-                pop_prop = (sum(pop)/sum(SP.POP.TOTL, na.rm =TRUE))*100,
-                pop_den = (pop/buffer_area))
-
-#2019 data
-ls_2019_wld_pop<-ls_2019_pop%>%
-  group_by(Distance, Year)%>%
-  dplyr::filter(!pop ==0 )%>%
-  dplyr::summarise(n_countries = length(unique(ISO3)),
-                    pop = sum(pop, na.rm = TRUE), 
-                   buffer_area = sum(buffer_area, na.rm = TRUE),
-                   ISO3 = "WLD", NAME_0 = "World")%>%
-  dplyr::mutate(SP.POP.TOTL = sum(ls_2019_pop_cc$SP.POP.TOTL),
-                pop_prop = (sum(pop)/sum(SP.POP.TOTL, na.rm =TRUE))*100,
-                pop_den = (pop/buffer_area))
 
 ##Joining to 2000 to 2018 dataframes
 
@@ -256,6 +232,72 @@ crc_pop_all$Income_Group[crc_pop_all$ISO3 == "AUS"]<-"High income"
 #Save dataframe for plotting
 write_csv(crc_pop_all, "./data/crc_pop_all.csv")
 
+##Creating world summaries of population
+
+#Downloading Global populations for calculating actual Global population propotion
+
+pop_tot_20<- wb(indicator = "SP.POP.TOTL", startdate = 2020, enddate = 2020)
+
+pop_tot_20<-pop_tot_20%>%
+  dplyr::select("iso3c", "date", "value")%>%
+  rename("ISO3" = "iso3c",
+         "Year" = "date",
+         "SP.POP.TOTL" = "value")
+
+pop_tot_20<-pop_tot_20%>%
+  dplyr::filter(ISO3 %in% "WLD")
+  
+pop_tot_20$Year<-as.integer(pop_tot_20$Year)
+
+
+pop_tot_19<- wb(indicator = "SP.POP.TOTL", startdate = 2019, enddate = 2019)
+
+pop_tot_19<-pop_tot_19%>%
+  dplyr::select("iso3c", "date", "value")%>%
+  rename("ISO3" = "iso3c",
+         "Year" = "date",
+         "SP.POP.TOTL" = "value")
+
+pop_tot_19<-pop_tot_19%>%
+  dplyr::filter(ISO3 %in% "WLD")
+
+
+pop_tot_19$Year<-as.integer(pop_tot_19$Year)
+
+
+#2020 population data
+ls_2020_wld_pop<-ls_2020_pop%>%
+  group_by(Distance, Year)%>%
+  dplyr::filter(!pop ==0 )%>%
+  dplyr::summarise(n_countries = length(unique(ISO3)),
+                   pop = sum(pop, na.rm = TRUE), 
+                   buffer_area = sum(buffer_area, na.rm = TRUE),
+                   ISO3 = "WLD", NAME_0 = "World")%>%
+  dplyr::mutate(SP.POP.TOTL = sum(ls_2020_pop_cc$SP.POP.TOTL),
+                pop_prop = (sum(pop)/sum(SP.POP.TOTL, na.rm =TRUE))*100,
+                pop_den = (pop/buffer_area))
+
+
+#2019 data
+ls_2019_wld_pop<-ls_2019_pop%>%
+  group_by(Distance, Year)%>%
+  dplyr::filter(!pop ==0 )%>%
+  dplyr::summarise(n_countries = length(unique(ISO3)),
+                   pop = sum(pop, na.rm = TRUE), 
+                   buffer_area = sum(buffer_area, na.rm = TRUE),
+                   ISO3 = "WLD", NAME_0 = "World")%>%
+  dplyr::mutate(SP.POP.TOTL = sum(ls_2019_pop_cc$SP.POP.TOTL),
+                pop_prop = (sum(pop)/sum(SP.POP.TOTL, na.rm =TRUE))*100,
+                pop_den = (pop/buffer_area))
+
+#Insert correct total
+ls_2020_wld_pop<-ls_2020_wld_pop%>%
+  mutate(SP.POP.TOTL = ifelse(ISO3 %in% "WLD", pop_tot_20$SP.POP.TOTL, SP.POP.TOTL))
+
+ls_2019_wld_pop<-ls_2019_wld_pop%>%
+  mutate(SP.POP.TOTL = ifelse(ISO3 %in% "WLD", pop_tot_19$SP.POP.TOTL, SP.POP.TOTL))
+
+
 #Join Global level dataframes
 coral_pop_all_world_data_pct$Year<-as.integer(coral_pop_all_world_data_pct$Year)
 wld_pop_all<-full_join(coral_pop_all_world_data_pct, ls_2019_wld_pop)
@@ -265,7 +307,8 @@ wld_pop_all<-full_join(wld_pop_all, ls_2020_wld_pop)
 wld_pop_all<-wld_pop_all%>%
   group_by(ISO3, Distance)%>%
   arrange(Year)%>%
-  mutate(pop_change = pct(pop))%>%
+  mutate(pop_change = pct(pop),
+         pop_prop = (pop/SP.POP.TOTL)*100)%>%
   ungroup()
 
 #Add Population growth data
