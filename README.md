@@ -8,18 +8,32 @@ reefs over space and time”
 
 ## 1. Contents of repository
 
-### `data-raw/`
+### [`data/`](https://github.com/amysw13/human_populations_by_coral_reefs/tree/main/data)
 
-Contains raw data
+Contains
 
-### `data/`
+-   Coral reef buffers from 5 - 100 km, including US state buffers.
+-   Coral reef countries details
+-   Coral reef countries and US states spatial polygons
 
-Contains coral reef buffers
+**Note:** LandScan and GADM data is not included here but can be
+accessed from their websites
 
-### `scripts/`
+-   [LandScan](https://landscan.ornl.gov)
+-   [GADM](https://gadm.org/data.html)
 
-Contains scripts for buffer creation, population extraction, analysis
+### [`scripts/`](https://github.com/amysw13/human_populations_by_coral_reefs/tree/main/scripts)
+
+Contains scripts for buffer creation, population extractions, analysis
 and plotting
+
+### [`Output_pop/`](https://github.com/amysw13/human_populations_by_coral_reefs/tree/main/Output_pop)
+
+Contains populations outputs from 2019 and 2020 only, as examples
+
+### [`Plot/`](https://github.com/amysw13/human_populations_by_coral_reefs/tree/main/Plot)
+
+Contains plots from the study
 
 ## 2. Study workflow
 
@@ -55,10 +69,7 @@ analysis of the study
     -   SID
     -   Income\_group
 
-5.**Plotting\_main\_graphs.R**
+5.**population\_plotting.R**
 
--   Plotting the main figures found in the study
-
-6.**Tables\_df.R**
-
--   Wrangling df’s to create tables for study
+-   Plotting figures from study
+    -   Excluding code for bump graphs

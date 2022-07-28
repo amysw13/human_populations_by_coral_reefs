@@ -49,7 +49,6 @@ prop_100_countries<-country_pop_all%>%
                 !ISO3 %in% c("XPI", "XSP"))%>%
   slice(1)
 
-
 write.csv(prop_100_countries, file = "./data/100_prop_countries.csv")
 
 ##Set up for plotting####
@@ -466,7 +465,4 @@ plot(SID_pop_change)
 
 ggsave("./Plot/SI/SID_pop_change.png", SID_pop_change, bg = "transparent", width = 21, height = 22, units =  "cm",
        dpi = 300) #for transparent
-
-#Bump graphs - country rankings####
-
 
