@@ -6,6 +6,8 @@
 Repository for the study titled “An assessment of people living by coral
 reefs over space and time”
 
+[![DOI](https://zenodo.org/badge/510611252.svg)](https://zenodo.org/badge/latestdoi/510611252)
+
 ## 1. Contents of repository
 
 ### [`data/`](https://github.com/amysw13/human_populations_by_coral_reefs/tree/main/data)
